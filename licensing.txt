@@ -1,0 +1,15 @@
+Open SCETool is copyright Spaceman Spiff, and is licensed under the terms of the GPL version 3.0 (see COPYING)
+Some segments of the code / files fall under other licenses and/or other authors, as detailed below.
+
+- polarssl/*.h, aes.c & sha1.c is part of Polar SSL (https://polarssl.org/), 
+	the code is distributed under the GPL 2.0 or later.
+- ec.c, bn.c and some functions under util.c is part of Part of the Fail0verflow's ps3tools, distributed under GPL 2.0 or later
+- aes_omac.c was taken from geohot's ps3publictools, distributed under GPL 3.0
+- mt19937.c, a pseudo random number generator is a Copyright (C) 1997 - 2002, Makoto Matsumoto and Takuji Nishimura, under GPL license
+- types.h, list.c, most part of util.c taken from the pfdtools of flatz
+
+This code may be freely used and modified for any purpose
+providing that this copyright notice is included with it.
+Spaceman Spiff makes no warranty for this code, and cannot be held
+liable for any real or imagined damage resulting from its use.
+Users of this code must verify correctness for their application.

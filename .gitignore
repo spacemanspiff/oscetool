@@ -15,3 +15,7 @@
 *.exe
 *.out
 *.app
+*.o
+
+oscetool
+.*.swp
