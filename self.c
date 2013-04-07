@@ -122,8 +122,8 @@ static void print_sce_header(FILE *out, sce_hdr_t *h) {
   }
 
   fprintf(out, " Metadata Offset 0x%08X\n", h->metadata_offset);
-  fprintf(out, " Header Length   0x%016llX\n", h->header_len);
-  fprintf(out, " Data Length     0x%016llX\n",h->data_filesize);
+  fprintf(out, " Header Length   0x%016" PRIX64 "\n", h->header_len);
+  fprintf(out, " Data Length     0x%016" PRIX64 "\n",h->data_filesize);
 }
 
 static void print_metadata_key(FILE *out, metadata_t *keys) {
@@ -135,7 +135,7 @@ static void print_metadata_key(FILE *out, metadata_t *keys) {
 
 static void print_metadata_header(FILE *out, metadata_header_t *h) {
   fprintf(out, "[*] Metadata Header:\n");
-  fprintf(out, " Signature Input Length 0x%016llX\n", h->signature_input_length);
+  fprintf(out, " Signature Input Length 0x%016" PRIX64 "\n", h->signature_input_length);
   fprintf(out, " unknown_0              0x%08X\n", h->unknown0);
   fprintf(out, " Section Count          0x%08X\n", h->section_count);
   fprintf(out, " Key Count              0x%08X\n", h->key_count);
@@ -147,7 +147,7 @@ static void print_metadata_header(FILE *out, metadata_header_t *h) {
 static void print_metadata_section_header_entry(FILE *out, 
 						metadata_section_header_t *section_header, 
 						int index) {
-  fprintf(out, " %03d %08llX %08llX %02X   %02X    ",
+  fprintf(out, " %03d %08" PRIX64 " %08" PRIX64 " %02X   %02X    ",
 	  index,
 	  section_header->data_offset, 
 	  section_header->data_size,
@@ -1118,15 +1118,15 @@ static void elf64_program_header_entry_adjust_endianness(elf64_program_header_t 
 
 static void print_self_extended_header(FILE *out, self_extended_header_t *h) {
   fprintf(out, "[*] SELF Header:\n");
-  fprintf(out, " Header Type         0x%016llX\n", h->header_type);
-  fprintf(out, " App Info Offset     0x%016llX\n", h->appinfo_offset);
-  fprintf(out, " ELF Offset          0x%016llX\n", h->elf_offset);
-  fprintf(out, " PH Offset           0x%016llX\n", h->phdr_offset);
-  fprintf(out, " SH Offset           0x%016llX\n", h->shdr_offset);
-  fprintf(out, " Section Info Offset 0x%016llX\n", h->section_info_offset);
-  fprintf(out, " SCE Version Offset  0x%016llX\n", h->sceversion_offset);
-  fprintf(out, " Control Info Offset 0x%016llX\n", h->controlinfo_offset);
-  fprintf(out, " Control Info Size   0x%016llX\n", h->controlinfo_size);
+  fprintf(out, " Header Type         0x%016" PRIX64 "\n", h->header_type);
+  fprintf(out, " App Info Offset     0x%016" PRIX64 "\n", h->appinfo_offset);
+  fprintf(out, " ELF Offset          0x%016" PRIX64 "\n", h->elf_offset);
+  fprintf(out, " PH Offset           0x%016" PRIX64 "\n", h->phdr_offset);
+  fprintf(out, " SH Offset           0x%016" PRIX64 "\n", h->shdr_offset);
+  fprintf(out, " Section Info Offset 0x%016" PRIX64 "\n", h->section_info_offset);
+  fprintf(out, " SCE Version Offset  0x%016" PRIX64 "\n", h->sceversion_offset);
+  fprintf(out, " Control Info Offset 0x%016" PRIX64 "\n", h->controlinfo_offset);
+  fprintf(out, " Control Info Size   0x%016" PRIX64 "\n", h->controlinfo_size);
 }
 
 static void print_self_application_info(FILE *out, info_header_t *h) {
@@ -1138,10 +1138,10 @@ static void print_self_application_info(FILE *out, info_header_t *h) {
   if (auth_id_name) {
     fprintf(out, " Auth-ID   ");
     if ( raw_output == 1 )
-      fprintf(out, "0x%016llX ",  h->authid);
+      fprintf(out, "0x%016" PRIX64 " ",  h->authid);
     fprintf(out, "[%s]\n", auth_id_name);
   } else {
-    fprintf(out, " Auth-ID   0x%016llX\n", h->authid);
+    fprintf(out, " Auth-ID   0x%016" PRIX64 "\n", h->authid);
   }
   
   const char *vendor_id_name = id2name(h->vendor_id, vendor_ids, NULL);  
@@ -1202,7 +1202,7 @@ static void print_control_flag(FILE *out, control_flag_t *flag) {
       if (flag->file_digest.version) {				
 	uint64_t version = flag->file_digest.version;
 	
-	fprintf(out, " FW Version %lld [%02lld.%02lld]\n",
+	fprintf(out, " FW Version %" PRId64 " [%02" PRId64 ".%02" PRId64 "]\n",
 		version, version  / 10000, version  % 10000 / 100);
       }
     }
@@ -1215,8 +1215,8 @@ static void print_control_flag(FILE *out, control_flag_t *flag) {
     _hexdump(out, " Random Pad  ", 0, flag->npdrm.hash, 16, 0);
     _hexdump(out, " CID_FN Hash ", 0, flag->npdrm.hash_iv, 16, 0);
     _hexdump(out, " CI Hash     ", 0, flag->npdrm.hash_xor, 16, 0);
-    fprintf(out, " unknown_1    0x%016llX\n", flag->npdrm.unknown1);
-    fprintf(out, " unknown_2    0x%016llX\n", flag->npdrm.unknown2);
+    fprintf(out, " unknown_1    0x%016" PRIX64 "\n", flag->npdrm.unknown1);
+    fprintf(out, " unknown_2    0x%016" PRIX64 "\n", flag->npdrm.unknown2);
   }	
 }
 
@@ -1253,9 +1253,9 @@ static void print_capability_flag(FILE *out, capability_flag_t *flag) {
     if (raw_output == 1)
       _hexdump(out, " Flags", 0, (uint8_t *) payload,sizeof(capability_flag_payload_t), 0);
     capability_flag_payload_adjust_endianness(payload);
-    fprintf(out, " unknown_3 0x%016llX\n", payload->unknown3);
-    fprintf(out, " unknown_4 0x%016llX\n", payload->unknown4);
-    fprintf(out, " Flags     0x%016llX [ ", payload->flags);
+    fprintf(out, " unknown_3 0x%016" PRIX64 "\n", payload->unknown3);
+    fprintf(out, " unknown_4 0x%016" PRIX64 "\n", payload->unknown4);
+    fprintf(out, " Flags     0x%016" PRIX64 " [ ", payload->flags);
     print_capability_flag_payload(out, payload);
     fprintf(out, "]\n");
     fprintf(out, " unknown_6 0x%08X\n", payload->unknown6);
@@ -1304,9 +1304,9 @@ static void print_elf64_header(FILE *out, elf64_hdr_t *h) {
     printf(" Machine                0x%04X\n", h->machine);
   }
   fprintf(out, " Version                0x%08X\n", h->version);
-  fprintf(out, " Entry                  0x%016llX\n", h->entry_point);
-  fprintf(out, " Program Headers Offset 0x%016llX\n", h->program_header_offset);
-  fprintf(out, " Section Headers Offset 0x%016llX\n", h->section_header_offset);
+  fprintf(out, " Entry                  0x%016" PRIX64 "\n", h->entry_point);
+  fprintf(out, " Program Headers Offset 0x%016" PRIX64 "\n", h->program_header_offset);
+  fprintf(out, " Section Headers Offset 0x%016" PRIX64 "\n", h->section_header_offset);
   fprintf(out, " Flags                  0x%08X\n", h->flags);
   fprintf(out, " Program Headers Count  %04d\n", h->program_header_count);
   fprintf(out, " Section Headers Count  %04d\n", h->section_header_count);
@@ -1355,7 +1355,7 @@ static void print_elf64_section_header(FILE *out, elf64_section_header_t *h, int
   } else {
     printf("%08X      ", h->type);
   }
-  fprintf(out,"%s   %08llX   %08llX %08llX %04llX %08llX %03d\n", permissions,
+  fprintf(out,"%s   %08" PRIX64 "   %08" PRIX64 " %08" PRIX64 " %04" PRIX64 " %08" PRIX64 " %03d\n", permissions,
 	  h->virtual_addr,
 	  h->offset_in_file,
 	  h->segment_size,
@@ -1426,7 +1426,7 @@ static void print_elf64_program_header(FILE *out, elf64_program_header_t *e, int
     printf("%08X ", e->type);
   }
   
-  fprintf(out, "%08llX %08llX %08llX %08llX %08llX %s %s %s %08llX\n",
+  fprintf(out, "%08" PRIX64 " %08" PRIX64 " %08" PRIX64 " %08" PRIX64 " %08" PRIX64 " %s %s %s %08" PRIX64 "\n",
 	  e->offset_in_file,
 	  e->virtual_addr,
 	  e->phys_addr,
@@ -1478,7 +1478,7 @@ int print_self(FILE *out, sce_info_t *sce_info) {
       int i = 0;
       while (i < elf32_header->program_header_count) {
 	section_info_adjust_endianness(si);
-	fprintf(out, " %03d %08llX %08llX %s      %08X %08X %s\n",
+	fprintf(out, " %03d %08" PRIX64 " %08" PRIX64 " %s      %08X %08X %s\n",
 		i, si->offset, si->size,
 		(si->compressed == 2)?"[YES]":"[NO ]",
 		si->unknown1, si->unknown2,
@@ -1525,7 +1525,7 @@ int print_self(FILE *out, sce_info_t *sce_info) {
       int i = 0;
       while (i < elf64_header->program_header_count) {
 	section_info_adjust_endianness(si);
-	fprintf(out, " %03d %08llX %08llX %s      %08X %08X %s\n",
+	fprintf(out, " %03d %08" PRIX64 " %08" PRIX64 " %s      %08X %08X %s\n",
 		i, si->offset, si->size,
 		(si->compressed == 2)?"[YES]":"[NO ]",
 		si->unknown1, si->unknown2,
@@ -1948,12 +1948,12 @@ static int build_self_64(sce_info_t* sce_info, encrypt_options_t *opts) {
 	const char *name = id2name(program_header->type, program_header_types, NULL);
         if ( !name ) {
           if (verbose)
-            printf("[*] Skipped program header 0x%08X @ 0x%08llX (0x%08llX)\n", program_header->type, 
+            printf("[*] Skipped program header 0x%08X @ 0x%08" PRIX64 " (0x%08" PRIX64 ")\n", program_header->type, 
 		   program_header->offset_in_file,
 		   program_header->segment_size);		  
         } else {
 	  if (verbose) 
-            printf("[*] Skipped program header %-8s @ 0x%08llX (0x%08llX)\n", name, 
+            printf("[*] Skipped program header %-8s @ 0x%08" PRIX64 " (0x%08" PRIX64 ")\n", name, 
 		   program_header->offset_in_file,
 		   program_header->segment_size);		  
 	}

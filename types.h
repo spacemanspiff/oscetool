@@ -29,6 +29,7 @@
 
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <inttypes.h>
 
 #if !defined(MAX_PATH)
 #	define MAX_PATH 260

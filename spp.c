@@ -42,7 +42,7 @@ void print_spp_header(FILE *out, spp_header_t *h) {
   fprintf(out, " SPP Size    0x%08X\n", h->spp_size);
   fprintf(out, " unk3        0x%08X\n", h->unk3);
   fprintf(out, " unk4        0x%08X\n", h->unk4);
-  fprintf(out, " unk5        0x%016llX\n", h->unk5);
+  fprintf(out, " unk5        0x%016" PRIX64 "\n", h->unk5);
   fprintf(out, " Entry Count 0x%08X\n", h->entry_count);
   fprintf(out, " unk7        0x%08X\n", h->unk7);
 }
@@ -63,8 +63,8 @@ void print_spp(FILE *out, sce_info_t *sce_info) {
     fprintf(out, "[*] SPP Entry %02d:\n", i);
     fprintf(out, " Size            0x%08X\n", entry->size);
     fprintf(out, " Type            0x%08X\n", entry->type);
-    fprintf(out, " LPAR Auth-ID    0x%016llX\n", entry->lpar_authid);
-    fprintf(out, " Program Auth-ID 0x%016llX\n", entry->prog_authid);
+    fprintf(out, " LPAR Auth-ID    0x%016" PRIX64 "\n", entry->lpar_authid);
+    fprintf(out, " Program Auth-ID 0x%016" PRIX64 "\n", entry->prog_authid);
     fprintf(out, " Name            %s\n", entry->name);
     _hexdump(out, " Data", 0, &entry->data, entry->size - SPP_HEADER_NO_DATA_LEN, 1);
     entry = (void *) entry + entry->size;
