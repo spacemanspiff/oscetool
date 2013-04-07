@@ -162,7 +162,8 @@ uint8_t *_read_buffer(const char *file, uint32_t *length)
   fseek(fp, 0, SEEK_SET);
   
   uint8_t *buffer = (uint8_t *)malloc(sizeof(uint8_t) * size);
-  fread(buffer, sizeof(uint8_t), size, fp);
+  if(fread(buffer, sizeof(uint8_t), size, fp) != (sizeof(uint8_t) * size))
+    return NULL;
   
   if(length != NULL)
     *length = size;
@@ -194,12 +195,13 @@ void memcpy_inv(uint8_t *dst, uint8_t *src, uint32_t len) {
 
 char *read_line(char *s, int size, FILE *stream) {
 
-    fgets(s, size, stream);
-    int len = strlen(s);
-    if (len && s[len-1] == '\n')
-      s[len-1] = 0;
-    len = strlen(s);
-    if (len && s[len-1] == '\r')
-      s[len-1] = 0;
+    if(fgets(s, size, stream) != NULL) {
+        int len = strlen(s);
+        if (len && s[len-1] == '\n')
+          s[len-1] = 0;
+        len = strlen(s);
+        if (len && s[len-1] == '\r')
+          s[len-1] = 0;
+    }
     return s;
 }

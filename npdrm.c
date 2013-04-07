@@ -221,7 +221,10 @@ int add_npdrm_footer_sig(const char *filename) {
     fclose(fp);
     return 0;
   }
-  fread(buffer, 1, size, fp);
+
+  if(fread(buffer, 1, size, fp) != size)
+    return 0;
+    
   
   sha1(buffer, size, hash);
   
