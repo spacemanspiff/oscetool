@@ -41,7 +41,7 @@ static void print_revoke_list_header(FILE *out, revoke_list_header_t *h) {
     sprintf(version, "%02X.%02X", version_major, version_minor);
     fprintf(out, " Version     %s\n", version);
   } else {
-    fprintf(out, " Opaque      0x%016llX\n", h->pkg.unk0);
+    fprintf(out, " Opaque      0x%016" PRIX64 "\n", h->pkg.unk0);
   }
   fprintf(out, " Entry Count 0x%08X\n", h->entry_count);
 }
@@ -80,10 +80,10 @@ static void print_revoke_list_entry(FILE *out, revoke_entry_t *entry) {
   if (auth_id_name) {
     fprintf(out, "%-16s ", auth_id_name);
   } else {
-    fprintf(out, "%016llX ", entry->auth_id);
+    fprintf(out, "%016" PRIX64 " ", entry->auth_id);
   }
 
-  fprintf(out, "%016llX ", entry->mask);
+  fprintf(out, "%016" PRIX64 " ", entry->mask);
   fprintf(out, "\n");
 }
 		
