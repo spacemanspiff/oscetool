@@ -951,13 +951,15 @@ int decrypt_header(sce_info_t *sce_info, keyset_raw_t *keyset_override, metadata
   sce_info->metadata_keys = (void *) sce_info->metadata_section_header + (metadata_header->section_count) * sizeof(metadata_section_header_t);
   sce_info->metadata_keys_size = (metadata_header->key_count) * 16;
   
-  if (sce_info->sce_header->type == SCE_TYPE_SELF) {
+  if (sce_info->sce_header->type == SCE_TYPE_SELF && metadata_header->signature_info_size) {
     sce_info->capability_list = list_alloc();
     capability_flag_t *capability = (void *) sce_info->metadata_keys + 16 * (metadata_header->key_count);
     flag_header_adjust_endianness(&capability->header);
     list_append(sce_info->capability_list, capability);
-    while (capability->header.next) {
+    uint32_t size = 0;
+    while (capability->header.next && size < metadata_header->signature_info_size) {
       capability = (void *) capability + capability->header.size;
+      size += capability->header.size;
       list_append(sce_info->capability_list, capability);
     }
     // After capability flags, comes the signature
