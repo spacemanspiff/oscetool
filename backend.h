@@ -61,6 +61,7 @@ extern char *add_section_headers_value;
 extern char *skip_sections_value;
 extern char *self_control_flags_value;
 extern char *self_capability_flags_value;
+extern char *sys_process_sdk_version_value;
 
 extern char *np_license_type_value;
 extern char *np_app_type_value;

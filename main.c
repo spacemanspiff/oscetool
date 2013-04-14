@@ -55,6 +55,7 @@ char *add_section_headers_value = NULL;
 char *skip_sections_value = NULL;
 char *self_control_flags_value = NULL;
 char *self_capability_flags_value = NULL;
+char *sys_process_sdk_version_value = NULL;
 
 char *np_license_type_value = NULL;
 char *np_app_type_value = NULL;
@@ -109,7 +110,8 @@ void show_usage()
   printf(" -l, --np-klicensee     16 bytes              Override klicensee.\n");
   printf(" -g, --np-real-fname    e.g. EBOOT.BIN        Real Filename\n");
   printf(" -j, --np-add-sig       TRUE/FALSE(default)   Whether to add a NP sig. or not.\n");
-  
+  printf(" -p, --sys-param-ver    e.g. 00340001         Set sys_process_param SDK version.\n");
+
   exit(1);
 }
 
@@ -117,7 +119,7 @@ static void parse_args(int argc, char *argv[]) {
   int option_index;
   int c;
   
-  static const char* short_options = "hki:d:e:vrt:0:1:s:2:m:K:3:4:5:A:6:7:8:9:b:c:f:l:g:j:";
+  static const char* short_options = "hki:d:e:vrt:0:1:s:2:m:K:3:4:5:A:6:7:8:9:b:c:f:l:g:j:p:";
   static struct option long_options[] = {
     { "help",             no_argument,       NULL, 'h' },
     { "print-keys",       no_argument,       NULL, 'k' },
@@ -147,6 +149,7 @@ static void parse_args(int argc, char *argv[]) {
     { "np-klicensee",     required_argument, NULL, 'l' },
     { "np-real-fname",    required_argument, NULL, 'g' },
     { "np-add-sig",       required_argument, NULL, 'j' },
+    { "sys-param-ver",    required_argument, NULL, 'p' },
     { NULL, 0, NULL, 0 }
   };  
   
@@ -224,6 +227,9 @@ static void parse_args(int argc, char *argv[]) {
       break;
     case 'j':
       np_add_sig_value = optarg;
+      break;
+    case 'p':
+      sys_process_sdk_version_value = optarg;
       break;
     case 'k':
       option_valid = 1;

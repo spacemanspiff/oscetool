@@ -25,6 +25,7 @@
 #include "spp.h"
 #include "npdrm.h"
 #include "ids.h"
+#include "patches.h"
 
 // KEYSET_HEX_LEN = 220
 #define KEYSET_HEX_LEN (sizeof(keyset_t) * 2) 
@@ -144,6 +145,21 @@ static int set_encrypt_options_from_template(encrypt_options_t *opts) {
   opts->npdrm_info = NULL;
 
   return 1;
+}
+
+static patch_options_t *set_patch_options() {
+  patch_options_t *patch_opts = NULL;
+
+  if (sys_process_sdk_version_value) {
+	if (strlen(sys_process_sdk_version_value) != 8) {
+    		printf("[*] Warning: SDK Version should be 4 bytes long.\n");
+		return NULL;
+	}
+	patch_opts = malloc(sizeof(patch_opts));
+  	patch_opts->sdk_version = x_to_u64((char *)sys_process_sdk_version_value);
+  }
+  return patch_opts;
+
 }
 
 int set_encrypt_options(encrypt_options_t *opts) {
@@ -416,6 +432,7 @@ void backend_cmd_encrypt() {
   uint32_t file_size;
   sce_info_t *sce_info = NULL;
   encrypt_options_t opts;
+  patch_options_t *patch_opts;
 
   if (!filetype_value) {
     printf("[*] Error: Please specify a file type.\n");
@@ -457,16 +474,22 @@ void backend_cmd_encrypt() {
     if (!res)
       return;
 
+    patch_opts = set_patch_options();
+
     if (opts.self_type == SELF_TYPE_NPDRM)
       if (!set_npdrm_encrypt_options(&opts))
 	return;
 
     sce_info = create_self_info(inputfile, file_size);
+
+    patch_elf(sce_info->elf_data, patch_opts);
+
     if (!build_self(sce_info, &opts)) {
       printf("[*] Error: SELF not built.\n");
       return;
     }
     printf("[*] SELF built.\n");
+
     if (!(opts.self_type == SELF_TYPE_LDR || opts.self_type == SELF_TYPE_ISO))
       can_compress = 1;
   }

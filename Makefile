@@ -1,6 +1,7 @@
 TOOL	= oscetool
 OBJS	= aes.o aes_omac.o backend.o bn.o ec.o ids.o keys.o list.o \
-	  main.o mt19937.o npdrm.o rvk.o self.o sha1.o spp.o util.o
+	  main.o mt19937.o npdrm.o rvk.o self.o sha1.o spp.o util.o \
+	  patches.o
 
 #CC	= gcc
 CFLAGS	= -g -O2 -Wall -W

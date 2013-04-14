@@ -54,6 +54,7 @@ OPTIONS                 Possible Values       Explanation
  -l, --np-klicensee     16 bytes              Override klicensee.  
  -g, --np-real-fname    e.g. EBOOT.BIN        Real Filename  
  -j, --np-add-sig       TRUE/FALSE(default)   Whether to add a NP sig. or not.    
+ -p, --sys-param-ver    e.g. 00340001         Set sys_process_param SDK version.
 
 
 What was tested to be working fine
