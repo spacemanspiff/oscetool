@@ -8,6 +8,8 @@ Some segments of the code / files fall under other licenses and/or other authors
 - mt19937.c, a pseudo random number generator is a Copyright (C) 1997 - 2002, Makoto Matsumoto and Takuji Nishimura, under GPL license
 - types.h, list.c, most part of util.c taken from the pfdtools of flatz
 
+Thanks to D_Skywalk for his useful patches
+
 This code may be freely used and modified for any purpose
 providing that this copyright notice is included with it.
 Spaceman Spiff makes no warranty for this code, and cannot be held
