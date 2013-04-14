@@ -38,19 +38,6 @@ void flag_header_adjust_endianness(flag_header_t *header) {
   header->next = ES64(header->next); 
 }
 
-static int key_revision_valid() {
-  char *c = key_revision_value;
-
-  while (*c) {
-    if (*c < '0' || *c > '9') {
-      if ((*c < 'a' || *c > 'f') && (*c < 'A' || *c > 'F'))
-	return 0;
-    }
-    ++c;
-  }
-  return 1;
-}
-
 static int set_encrypt_options_from_template(encrypt_options_t *opts) {
   self_header_t *template = (self_header_t *) _read_buffer(template_path, NULL);
 
@@ -168,7 +155,7 @@ int set_encrypt_options(encrypt_options_t *opts) {
     return 0;
   }
 
-  if ( !key_revision_valid() ) {
+  if (!valid_hex(key_revision_value)) {
     printf("[*] Error (Key Revision): Please provide a valid hexadecimal number.\n");
     return 0;
   }

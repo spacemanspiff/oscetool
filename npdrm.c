@@ -26,6 +26,7 @@
 #include "aes_omac.h"
 #include "keys.h"
 #include "ids.h"
+#include "klics.h"
 
 static void npd_controlflag_payload_adjust_endianness(npdrm_info_t *p) {
   p->magic = ES32(p->magic);
@@ -54,44 +55,51 @@ static npdrm_info_t *npdrm_adjust_endianness_control_flag(sce_info_t *sce_info) 
 }
 
 int decrypt_with_klic(sce_info_t *sce_info) {
-	npdrm_info_t *npdrm_info = npdrm_adjust_endianness_control_flag(sce_info);
-	if (!npdrm_info) {
-		return 0;
-	}
+  npdrm_info_t *npdrm_info = npdrm_adjust_endianness_control_flag(sce_info);
+  if (!npdrm_info) {
+    return 0;
+  }
 
-	keyset_t *np_keyset = find_keyset_by_name("NP_klic_key");
-	if (!np_keyset) {
-		return 0;
-	}
+  keyset_t *np_keyset = find_keyset_by_name("NP_klic_key");
+  if (!np_keyset) {
+    return 0;
+  }
 
-	uint8_t klic[16];
-	uint8_t iv[16];
-	aes_context aes_ctx;
+  uint8_t klic[16];
+  uint8_t iv[16];
+  aes_context aes_ctx;
 
-	if (klicensee) {
-		memcpy(klic, klicensee, 16);
-	} else if (npdrm_info->license_type == NPDRM_LICENSETYPE_FREE) {
-        	keyset_t *klic_free = find_keyset_by_name("NP_klic_free");
-		if (!klic_free) {
-			return 0;
-		}
-		memcpy(klic, klic_free->erk_key, 16);
-	} else if (npdrm_info->license_type == NPDRM_LICENSETYPE_LOCAL) {
-		if (!decrypt_klicensee(npdrm_info->content_id, klic))
-			return 0;
-	} else {
-		return 0;
-	}
-	aes_setkey_dec(&aes_ctx, np_keyset->erk_key, np_keyset->erk_len * 8);
-	aes_crypt_ecb(&aes_ctx, AES_DECRYPT, klic, klic);
-	aes_setkey_dec(&aes_ctx, klic, 128);
-	memset(iv, 0, sizeof(iv));
-	aes_crypt_cbc(&aes_ctx, AES_DECRYPT, sizeof(metadata_t), iv, (uint8_t *) sce_info->metadata_aes_keys, (uint8_t *) sce_info->metadata_aes_keys);
-	return 1;
+  if (!klicensee) {
+    klicensee = find_klicensee((char *) npdrm_info->content_id);
+    if (klicensee) {
+      printf("[*] Found klicensee for %s\n", npdrm_info->content_id);
+    }
+  }
+
+  if (klicensee) {
+    memcpy(klic, klicensee, 16);
+  } else if (npdrm_info->license_type == NPDRM_LICENSETYPE_FREE) {
+   keyset_t *klic_free = find_keyset_by_name("NP_klic_free");
+   if (!klic_free) {
+     return 0;
+   }
+   memcpy(klic, klic_free->erk_key, 16);
+  } else if (npdrm_info->license_type == NPDRM_LICENSETYPE_LOCAL) {
+   if (!decrypt_klicensee(npdrm_info->content_id, klic))
+     return 0;
+  } else {
+    return 0;
+  }
+  aes_setkey_dec(&aes_ctx, np_keyset->erk_key, np_keyset->erk_len * 8);
+  aes_crypt_ecb(&aes_ctx, AES_DECRYPT, klic, klic);
+  aes_setkey_dec(&aes_ctx, klic, 128);
+  memset(iv, 0, sizeof(iv));
+  aes_crypt_cbc(&aes_ctx, AES_DECRYPT, sizeof(metadata_t), iv, (uint8_t *) sce_info->metadata_aes_keys, (uint8_t *) sce_info->metadata_aes_keys);
+  return 1;
 }
 
 int npdrm_encrypt(sce_info_t *sce_info) {
-	aes_context aes_ctx;
+  aes_context aes_ctx;
   uint8_t klic[16];
 	
   npdrm_info_t *payload = npdrm_adjust_endianness_control_flag(sce_info);
@@ -104,30 +112,31 @@ int npdrm_encrypt(sce_info_t *sce_info) {
   if (!np_klic) {
 	return 0;
   }
-      if (klicensee) {
-		memcpy(klic, klicensee, 16);
-	  } else if (payload->license_type == 3) {
-        keyset_t *np_klic_free = find_keyset_by_name("NP_klic_free");
-        if (!np_klic_free) {
-			return 0;
-		}
-		memcpy(klic, np_klic_free->erk_key, 16);
-	  } else if (payload->license_type == 2) {
-		if (!decrypt_klicensee(payload->content_id, klic))
-			return 0;
-	  }
+
+  if (klicensee) {
+    memcpy(klic, klicensee, 16);
+  } else if (payload->license_type == 3) {
+    keyset_t *np_klic_free = find_keyset_by_name("NP_klic_free");
+    if (!np_klic_free) {
+      return 0;
+    }
+    memcpy(klic, np_klic_free->erk_key, 16);
+  } else if (payload->license_type == 2) {
+    if (!decrypt_klicensee(payload->content_id, klic))
+      return 0;
+  }
 	
-	uint8_t iv[16];
-	memset(iv, 0, 16);
+  uint8_t iv[16];
+  memset(iv, 0, 16);
 
-    aes_setkey_dec(&aes_ctx, np_klic->erk_key, 128);
-    aes_crypt_ecb(&aes_ctx, AES_DECRYPT, klic, klic);
+  aes_setkey_dec(&aes_ctx, np_klic->erk_key, 128);
+  aes_crypt_ecb(&aes_ctx, AES_DECRYPT, klic, klic);
 
-    aes_setkey_enc(&aes_ctx, klic, 128);
-    aes_crypt_cbc(&aes_ctx, AES_ENCRYPT, sizeof(metadata_t), iv,
-			sce_info->output + sce_info->metadata_aes_keys_offset,
-			sce_info->output + sce_info->metadata_aes_keys_offset);
-    return 1;
+  aes_setkey_enc(&aes_ctx, klic, 128);
+  aes_crypt_cbc(&aes_ctx, AES_ENCRYPT, sizeof(metadata_t), iv,
+                sce_info->output + sce_info->metadata_aes_keys_offset,
+                sce_info->output + sce_info->metadata_aes_keys_offset);
+  return 1;
 }
 
 int create_npd_controlflag_payload(npdrm_encrypt_info_t *npdrm_opt, npdrm_info_t *payload) {
@@ -145,13 +154,13 @@ int create_npd_controlflag_payload(npdrm_encrypt_info_t *npdrm_opt, npdrm_info_t
   } else if (npdrm_opt->license_type == NPDRM_LICENSETYPE_FREE) {
     keyset_t *klic_free = find_keyset_by_name("NP_klic_free");
     if (!klic_free )
-		return 0;
+      return 0;
     memcpy(klic, klic_free->erk_key, 16);	
   } else if (npdrm_opt->license_type == NPDRM_LICENSETYPE_LOCAL) {
-	if (!decrypt_klicensee(npdrm_opt->content_id, klic))
-		return 0;
+    if (!decrypt_klicensee(npdrm_opt->content_id, klic))
+      return 0;
   } else
-	return 0;
+    return 0;
 
   payload->magic = NPDRM_MAGIC; // 0x4E504400
   payload->unknown0 = 1;

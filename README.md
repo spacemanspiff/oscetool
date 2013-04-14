@@ -6,10 +6,12 @@ scetool was reverse engineered and analized to produce this program, and copied 
 Installation
 ------------
 The instalation is the same of the scetool.  
-You should put your keys inside the data directory along with the vsh_curves & ldr_curves  
+You should put your keys inside the data directory along with the vsh\_curves & ldr\_curves
 Your idps and actdat should be inside the data directory too.  
 The rap files should go inside the raps directory (at the same level of data directory).  
 The rif files should go inside the rifs directory (at the same level of data directory).  
+You can put klics.txt in the data directory and it will automatically find the klicensee
+by looking up the content\_id. 
 
 If you wish, you can set the PS3 environment variable to point to the data directory 
 (your raps & rifs should go inside the same directory in this case).  
@@ -19,7 +21,9 @@ Usage
 -----
 The usage is exactly the same of the original SCETool, so if you know how to use it.  
 You know how to use this tool.  
-  
+
+The new options available are "-p" to patch the ELF the same way FixELF.exe does.
+Also, if klics.txt is available, it can automatically choose the klicensee. 
   
 USAGE: oscetool [options] command  
 COMMANDS                Parameters            Explanation  
@@ -49,12 +53,13 @@ OPTIONS                 Possible Values       Explanation
  -8, --self-ctrl-flags  32 bytes              Override control flags.  
  -9, --self-cap-flags   32 bytes              Override capability flags.  
  -b, --np-license-type  LOCAL/FREE            License Type  
- -c, --np-app-type      SPRX/EXEC/USPRX/UEXEC App Type (U* for updates)  
+ -c, --np-app-type      SPRX/EXEC/USPRX/UEXEC App Type (U\* for updates)  
  -f, --np-content-id                          Content ID  
  -l, --np-klicensee     16 bytes              Override klicensee.  
  -g, --np-real-fname    e.g. EBOOT.BIN        Real Filename  
  -j, --np-add-sig       TRUE/FALSE(default)   Whether to add a NP sig. or not.    
- -p, --sys-param-ver    e.g. 00340001         Set sys_process_param SDK version.
+ -p, --sys-param-ver    e.g. 00340001         Set sys\_process\_param SDK version.
+
 
 
 What was tested to be working fine
@@ -85,4 +90,4 @@ please contact me.
 		- RVK: N/D
 		- SPP: N/D
 
-- RIF/RAF/IDPS management also not tested
+- RIF/RAF/IDPS management not tested

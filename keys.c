@@ -30,8 +30,6 @@
 
 #include "polarssl/aes.h"
 
-#define CONFIG_MAX_LINE_SIZE 512
-
 #define LOADER_CURVES_NUM 64
 #define VSH_CURVES_NUM 3
 

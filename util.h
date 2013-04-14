@@ -5,6 +5,8 @@
 
 #define ALIGN(x, a) (((x) + (a) - 1) & ~((a) - 1))
 
+#define CONFIG_MAX_LINE_SIZE 512
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -26,6 +28,8 @@ int exists(const char *directory_path);
 void memcpy_inv(uint8_t *dst, uint8_t *src, uint32_t len);
 
 char *read_line(char *s, int size, FILE *stream);
+int valid_hex_digit(char c);
+int valid_hex(const char *hexstr);
 
 #ifdef __cplusplus
 }

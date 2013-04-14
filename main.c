@@ -26,6 +26,8 @@
 #include "util.h"
 #include "keys.h"
 
+#include "klics.h"
+
 
 static int option_valid = 0;
 static int cmd_print = 0;
@@ -323,7 +325,6 @@ int main(int argc, char **argv)
     printf("[*] Warning: Could not load keys.\n");
   }
 
-
   // loader curves
   if (keysets_env) {
     sprintf(filename, "%s/%s", keysets_env, SCE_DATA_LDR_CURVES);
@@ -366,6 +367,24 @@ int main(int argc, char **argv)
       return 0;
     }
     klicensee = x_to_u8_buffer(klicensee_value);
+  } else {
+    if (keysets_env) {
+      sprintf(filename, "%s/%s", keysets_env, SCE_DATA_KLICS);
+      if ( !exists(filename) ) {
+        sprintf(filename, "%s/%s", SCE_DATA_DIR, SCE_DATA_KLICS);
+      } else {
+        sprintf(filename, "%s/%s", keysets_env, SCE_DATA_KLICS);
+      }
+    } else {
+      sprintf(filename, "%s/%s", SCE_DATA_DIR, SCE_DATA_KLICS);
+    }
+    if ( load_klicensees(filename) ) {
+      if ( verbose )
+        printf("[*] Loaded klicensees.\n");
+    } else {
+      if ( verbose )
+        printf("[*] Warning: Could not load klicenseees.\n");
+    }
   }
 
   if (cmd_print_keysets) {

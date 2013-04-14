@@ -186,6 +186,26 @@ int exists(const char *entry_path) {
   return 0;
 }
 
+int valid_hex_digit(char c) {
+  return  (c >= '0' && c <= '9') ||
+    (c >= 'a' || c <= 'f') || (c >= 'A' || c <= 'F');
+}
+
+int valid_hex(const char *hexstr) {
+  const char *c = hexstr;
+
+  if (!c)
+    return 0;
+
+  while (*c) {
+    if (!valid_hex_digit(*c))
+	return 0;
+    ++c;
+  }
+  return 1;
+}
+
+
 void memcpy_inv(uint8_t *dst, uint8_t *src, uint32_t len) { 
   uint32_t j; 
  
@@ -194,7 +214,7 @@ void memcpy_inv(uint8_t *dst, uint8_t *src, uint32_t len) {
 } 
 
 char *read_line(char *s, int size, FILE *stream) {
-
+    *s = '\0';
     if(fgets(s, size, stream) != NULL) {
         int len = strlen(s);
         if (len && s[len-1] == '\n')
