@@ -1,0 +1,9 @@
+Version 0.9.1
+-------------
+- Fixed a segfault decrypt some SELFs.
+- Added option -p to patch the sys_process_param when signing an ELF. This is the same as applying FixELF.exe before signing.
+- Added support to klics.txt. If the klicensee is not specified, it is looked up in the data/klics.txt automatically (only for decrypt).
+
+Version 0.9.0
+-------------
+- First commited version, compatible with SCETool 0.2.9.
