@@ -33,7 +33,7 @@
 #define SCE_DATA_VSH_CURVES "vsh_curves"
 #define SCE_DATA_KLICS "klics.txt"
 #define SCE_DATA_IDPS "idps"
-#define SCE_DATA_ACTDAT "actdat"
+#define SCE_DATA_ACTDAT "act.dat"
 #define SCE_DATA_RIFEXT ".rif"
 #define SCE_DATA_RIFDIR "./rifs"
 #define SCE_DATA_RAPEXT ".rap"

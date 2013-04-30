@@ -90,4 +90,5 @@ please contact me.
 		- RVK: N/D
 		- SPP: N/D
 
-- RIF/RAF/IDPS management not tested
+	- RAF/IDPS/ACT.DAT: OK
+	- RIF/IDPS/ACT.DAT: Not tested

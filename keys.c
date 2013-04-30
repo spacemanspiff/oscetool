@@ -481,6 +481,9 @@ static int rap_to_klicensee(const uint8_t *content_id, uint8_t *klicensee) {
   uint8_t key[16];
   aes_context aes_ctx;
   
+  if (!rap_key)
+    return 0;
+
   aes_setkey_dec(&aes_ctx, rap_initial_key, 128);
   aes_crypt_ecb(&aes_ctx, AES_DECRYPT, rap_key, key);
   
@@ -511,7 +514,7 @@ static int rap_to_klicensee(const uint8_t *content_id, uint8_t *klicensee) {
   }
 
   memcpy(klicensee, key, sizeof(key));
-  return 0;
+  return 1;
 }
 
 int decrypt_klicensee(const uint8_t *title_id, uint8_t *klic) {
@@ -519,6 +522,7 @@ int decrypt_klicensee(const uint8_t *title_id, uint8_t *klic) {
   if (rap_to_klicensee(title_id, klic)) {
     if (verbose == 1)
       printf("[*] klicensee converted from %s.rap.\n", title_id);
+    return 1;
   } else {
     uint8_t *idps_key = load_idps_key();
     if (!idps_key) {
