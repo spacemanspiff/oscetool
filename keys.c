@@ -523,55 +523,57 @@ int decrypt_klicensee(const uint8_t *title_id, uint8_t *klic) {
     if (verbose == 1)
       printf("[*] klicensee converted from %s.rap.\n", title_id);
     return 1;
-  } else {
-    uint8_t *idps_key = load_idps_key();
-    if (!idps_key) {
-      printf("[*] Error: Could not load IDPS.\n");
-      return 0;
-    }
-    
-    if ( verbose == 1 )
-      printf("[*] IDPS loaded.\n");
-    actdat_t *actdat = load_actdat();
-    if ( !actdat ) {
-      printf("[*] Error: Could not load act.dat.\n");
-      return 0;
-    }
-    if ( verbose == 1 )
-      printf("[*] act.dat loaded.\n");
-    keyset_t *idps_const_keyset = find_keyset_by_name("NP_idps_const");
-    uint8_t constactdat[16];
-    memcpy(constactdat, idps_const_keyset->erk_key, 16);
-    keyset_t *rif_keyset = find_keyset_by_name("NP_rif_key");
-    if (!idps_const_keyset  || !rif_keyset)
-      return 0;
-    rif_t *rif = load_rif(title_id);
-    if ( !rif ) {
-      printf("[*] Error: Could not obtain klicensee for '%s'.\n", title_id);
-      return 0;
-    }
-    aes_setkey_dec(&aes_ctx, rif_keyset->erk_key, 128);
-    aes_crypt_ecb(&aes_ctx, AES_DECRYPT, rif->padding, rif->padding);
-    uint32_t actdat_idx = ES32(rif->actdat_index);
-    if (actdat_idx > 127) {
-      printf("[*] Error: act.dat key index out of bounds.\n");
-      return 0;
-    }
-    uint8_t actdatkey_idx[16];
-    
-    memcpy(actdatkey_idx, actdat->key_table + 16 * actdat_idx, 16);
-    aes_setkey_enc(&aes_ctx, idps_key, 128);
-    aes_crypt_ecb(&aes_ctx, AES_ENCRYPT, constactdat, constactdat);
- 
-    aes_setkey_dec(&aes_ctx, constactdat, 128);
-    aes_crypt_ecb(&aes_ctx, AES_DECRYPT, actdatkey_idx, actdatkey_idx);
-
-    aes_setkey_dec(&aes_ctx, actdatkey_idx, 128);
-    aes_crypt_ecb(&aes_ctx, AES_DECRYPT, rif->key, klic);
-    free(rif);
-    if ( verbose == 1 )
-      printf("[*] klicensee decrypted.\n");
   }
+
+  uint8_t *idps_key = load_idps_key();
+  if (!idps_key) {
+    printf("[*] Error: Could not load IDPS.\n");
+    return 0;
+  }
+    
+  if ( verbose == 1 )
+    printf("[*] IDPS loaded.\n");
+
+  actdat_t *actdat = load_actdat();
+  if ( !actdat ) {
+    printf("[*] Error: Could not load act.dat.\n");
+    return 0;
+  }
+
+  if ( verbose == 1 )
+    printf("[*] act.dat loaded.\n");
+  keyset_t *idps_const_keyset = find_keyset_by_name("NP_idps_const");
+  uint8_t constactdat[16];
+  memcpy(constactdat, idps_const_keyset->erk_key, 16);
+  keyset_t *rif_keyset = find_keyset_by_name("NP_rif_key");
+  if (!idps_const_keyset  || !rif_keyset)
+    return 0;
+  rif_t *rif = load_rif(title_id);
+  if (!rif) {
+    printf("[*] Error: Could not obtain klicensee for '%s'.\n", title_id);
+    return 0;
+  }
+  aes_setkey_dec(&aes_ctx, rif_keyset->erk_key, 128);
+  aes_crypt_ecb(&aes_ctx, AES_DECRYPT, rif->padding, rif->padding);
+  uint32_t actdat_idx = ES32(rif->actdat_index);
+  if (actdat_idx > 127) {
+    printf("[*] Error: act.dat key index out of bounds.\n");
+    return 0;
+  }
+  uint8_t actdatkey_idx[16];
+  
+  memcpy(actdatkey_idx, actdat->key_table + 16 * actdat_idx, 16);
+  aes_setkey_enc(&aes_ctx, idps_key, 128);
+  aes_crypt_ecb(&aes_ctx, AES_ENCRYPT, constactdat, constactdat);
+
+  aes_setkey_dec(&aes_ctx, constactdat, 128);
+  aes_crypt_ecb(&aes_ctx, AES_DECRYPT, actdatkey_idx, actdatkey_idx);
+
+  aes_setkey_dec(&aes_ctx, actdatkey_idx, 128);
+  aes_crypt_ecb(&aes_ctx, AES_DECRYPT, rif->key, klic);
+  free(rif);
+  if ( verbose == 1 )
+    printf("[*] klicensee decrypted.\n");
   return 1;
 }
 
