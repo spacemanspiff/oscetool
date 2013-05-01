@@ -24,7 +24,7 @@
 #include "list.h"
 #include "self.h"
 
-#define OSCETOOL_VERSION "0.9.1"
+#define OSCETOOL_VERSION "0.9.2"
 
 #define SCE_DATA_ENV "PS3"
 #define SCE_DATA_DIR "./data"

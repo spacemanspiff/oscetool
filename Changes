@@ -1,3 +1,7 @@
+Version 0.9.2
+-------------
+- Fixed rap/rif/idps/act.dat management. Now it works fine
+
 Version 0.9.1
 -------------
 - Fixed a segfault decrypt some SELFs.

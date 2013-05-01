@@ -91,4 +91,4 @@ please contact me.
 		- SPP: N/D
 
 	- RAF/IDPS/ACT.DAT: OK
-	- RIF/IDPS/ACT.DAT: Not tested
+	- RIF/IDPS/ACT.DAT: OK
