@@ -2,7 +2,9 @@
 //#include "platform.h"
 
 #include "polarssl/sha1.h"
-#include "zlib.h"
+#include <zlib.h>
+
+#include "global.h"
 
 void  _hexdump(FILE *out, const char *name, uint32_t offset, uint8_t *buf, int len, int print_addr) {
   int i, j, align = strlen(name) + 1;
@@ -224,4 +226,26 @@ char *read_line(char *s, int size, FILE *stream) {
           s[len-1] = 0;
     }
     return s;
+}
+
+static char *data_env = NULL;
+static int initialized_env = 0;
+
+char *get_data_filename(const char *datafile, char *filename) {
+  filename[0] = 0;
+
+  if (!initialized_env) {
+    data_env = getenv(SCE_DATA_ENV);
+    initialized_env = 1;
+    if (!exists(data_env)) 
+      data_env = NULL;
+  }
+
+  if (data_env) {
+    sprintf(filename, "%s/%s", data_env, datafile);
+    if (exists(filename)) 
+	return filename;
+  }
+  sprintf(filename, "%s/%s", SCE_DATA_DIR, datafile);
+  return filename;
 }

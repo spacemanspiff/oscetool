@@ -24,21 +24,6 @@
 #include "list.h"
 #include "self.h"
 
-#define OSCETOOL_VERSION "0.9.2"
-
-#define SCE_DATA_ENV "PS3"
-#define SCE_DATA_DIR "./data"
-#define SCE_DATA_KEYS "keys"
-#define SCE_DATA_LDR_CURVES "ldr_curves"
-#define SCE_DATA_VSH_CURVES "vsh_curves"
-#define SCE_DATA_KLICS "klics.txt"
-#define SCE_DATA_IDPS "idps"
-#define SCE_DATA_ACTDAT "act.dat"
-#define SCE_DATA_RIFEXT ".rif"
-#define SCE_DATA_RIFDIR "./rifs"
-#define SCE_DATA_RAPEXT ".rap"
-#define SCE_DATA_RAPDIR "./raps"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

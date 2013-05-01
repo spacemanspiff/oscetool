@@ -14,7 +14,7 @@ You can put klics.txt in the data directory and it will automatically find the k
 by looking up the content\_id. 
 
 If you wish, you can set the PS3 environment variable to point to the data directory 
-(your raps & rifs should go inside the same directory in this case).  
+(your raps & rifs should go in the rap and rif directory).  
 
 
 Usage

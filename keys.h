@@ -98,6 +98,7 @@ int load_vsh_curves(const char *filename);
 
 //keyset_t *find_keyset_from_header(sce_info_t *sce_info);
 keyset_t *find_keyset_by_name(const char *name);
+uint8_t *find_key_by_name(const char *name);
 
 int decrypt_klicensee(const uint8_t *title_id, uint8_t *klic);
 

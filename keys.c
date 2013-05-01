@@ -24,6 +24,7 @@
 
 #include "ids.h" 
 
+#include "global.h"
 #include "backend.h"
 
 #include "npdrm.h"
@@ -328,6 +329,13 @@ keyset_t *find_keyset_from_header(sce_info_t *sce_info) {
   return keyset;
 }
 
+uint8_t *find_key_by_name(const char *name) {
+  keyset_t *keyset = find_keyset_by_name(name);
+  if (!keyset)
+    return NULL;
+  return keyset->erk_key;
+}
+
 keyset_t *find_keyset_by_name(const char *name) {
   list_node_t *node = list_head(keyset_list);
   while (node) {
@@ -361,15 +369,7 @@ curve_t *get_vsh_curve(uint32_t type) {
 
 static uint8_t *load_idps_key() {
   char filename[MAX_PATH];
-  char *keysets_env = getenv(SCE_DATA_ENV);
-  if (!keysets_env || !exists(keysets_env)) {
-    sprintf(filename, "%s/%s", SCE_DATA_DIR , SCE_DATA_IDPS);
-  } else {
-    sprintf(filename, "%s/%s", keysets_env, SCE_DATA_IDPS);
-    if (!exists(filename)) {
-      sprintf(filename, "%s/%s", SCE_DATA_DIR , SCE_DATA_IDPS);
-    }
-  }
+  get_data_filename(SCE_DATA_IDPS, filename);
 
   uint32_t size;
   uint8_t *idps = _read_buffer(filename, &size);
@@ -386,21 +386,13 @@ static uint8_t *load_idps_key() {
 
 static actdat_t *load_actdat() {
   char filename[MAX_PATH];
-  char *keysets_env = getenv(SCE_DATA_ENV);
-  if (!keysets_env || !exists(keysets_env)) {
-    sprintf(filename, "%s/%s", SCE_DATA_DIR , SCE_DATA_ACTDAT);
-  } else {
-    sprintf(filename, "%s/%s", keysets_env, SCE_DATA_ACTDAT);
-    if (!exists(filename)) {
-      sprintf(filename, "%s/%s", SCE_DATA_DIR , SCE_DATA_ACTDAT);
-    }
-  }
   uint32_t size;
+
+  get_data_filename(SCE_DATA_ACTDAT, filename);
   actdat_t *actdat = (actdat_t *) _read_buffer(filename, &size);
   if (!actdat)
     return NULL;
   
-  // 0x1038
   if (size != sizeof(actdat_t)) {
     free(actdat);
     return NULL;
@@ -409,22 +401,15 @@ static actdat_t *load_actdat() {
 }
 
 static rif_t *load_rif(const uint8_t *title_id) {
-  char filename[MAX_PATH];
-  char *keysets_env = getenv(SCE_DATA_ENV);
-  if (!keysets_env || !exists(keysets_env)) {
-    sprintf(filename, "%s/%s%s", SCE_DATA_RIFDIR, title_id, SCE_DATA_RIFEXT);
-  } else {
-    sprintf(filename, "%s/%s%s", keysets_env, title_id, SCE_DATA_RIFEXT);
-    if (!exists(filename)) {
-      sprintf(filename, "%s/%s%s", SCE_DATA_RIFDIR, title_id, SCE_DATA_RIFEXT);
-    }
-  }
   uint32_t size;
+  char filename[MAX_PATH];
+  char tmpfilename[MAX_PATH];
+  sprintf(tmpfilename, "%s/%s%s", SCE_DATA_RIFDIR, title_id, SCE_DATA_RIFEXT); 
+  get_data_filename(tmpfilename, filename);
   rif_t *rif = (rif_t *) _read_buffer(filename, &size);
   if (!rif)
     return NULL;
 
-  // 0x98
   if (size != sizeof(rif_t)) {
     free(rif);
     return NULL;
@@ -434,19 +419,12 @@ static rif_t *load_rif(const uint8_t *title_id) {
 }
 
 static uint8_t *load_rap(const uint8_t *content_id) {
-
-  char filename[MAX_PATH];
-  char *keysets_env = getenv(SCE_DATA_ENV);
-  if (!keysets_env || !exists(keysets_env)) {
-    sprintf(filename, "%s/%s%s", SCE_DATA_RAPDIR, content_id, SCE_DATA_RAPEXT);
-  } else {
-    sprintf(filename, "%s/%s%s", keysets_env, content_id, SCE_DATA_RAPEXT);
-    if (!exists(filename)) {
-      sprintf(filename, "%s/%s%s", SCE_DATA_RAPDIR, content_id, SCE_DATA_RAPEXT);
-    }
-  }
-
   uint32_t size;
+  char filename[MAX_PATH];
+  char tmpfilename[MAX_PATH];
+
+  sprintf(tmpfilename, "%s/%s%s", SCE_DATA_RAPDIR, content_id, SCE_DATA_RAPEXT); 
+  get_data_filename(tmpfilename, filename);
   uint8_t *rap = _read_buffer(filename, &size);
   if (!rap)
     return NULL;
@@ -461,19 +439,15 @@ static uint8_t *load_rap(const uint8_t *content_id) {
 
 static int rap_to_klicensee(const uint8_t *content_id, uint8_t *klicensee) {
   uint8_t *rap_key = load_rap(content_id);
+  
 
-  static uint8_t rap_initial_key[16] = {
-    0x86, 0x9F, 0x77, 0x45, 0xC1, 0x3F, 0xD8, 0x90, 0xCC, 0xF2, 0x91, 0x88, 0xE3, 0xCC, 0x3E, 0xDF
-  };
-  static uint8_t pbox[16] = {
-    0x0C, 0x03, 0x06, 0x04, 0x01, 0x0B, 0x0F, 0x08, 0x02, 0x07, 0x00, 0x05, 0x0A, 0x0E, 0x0D, 0x09
-  };
-  static uint8_t e1[16] = {
-    0xA9, 0x3E, 0x1F, 0xD6, 0x7C, 0x55, 0xA3, 0x29, 0xB7, 0x5F, 0xDD, 0xA6, 0x2A, 0x95, 0xC7, 0xA5
-  };
-  static uint8_t e2[16] = {
-    0x67, 0xD4, 0x5D, 0xA3, 0x29, 0x6D, 0x00, 0x6A, 0x4E, 0x7C, 0x53, 0x7B, 0xF5, 0x53, 0x8C, 0x74
-  };
+  uint8_t *rap_initial_key = find_key_by_name("NP_rap_initial");
+  uint8_t *pbox = find_key_by_name("NP_rap_pbox");
+  uint8_t *e1 = find_key_by_name("NP_rap_e1");
+  uint8_t *e2 = find_key_by_name("NP_rap_e2");
+
+  if (!rap_initial_key || !pbox || !e1 || !e2)
+    return 0;
         
   int round_num;
   int i;

@@ -22,6 +22,7 @@
 #include <unistd.h>
 #include <getopt.h>
 
+#include "global.h"
 #include "backend.h"
 #include "util.h"
 #include "keys.h"
@@ -298,22 +299,7 @@ int main(int argc, char **argv)
   show_version();  
   printf("\n");
 
-  char *keysets_env = getenv(SCE_DATA_ENV);
-
-  if (keysets_env) {
-    if (!exists(keysets_env)) {
-      sprintf(filename, "%s/%s", SCE_DATA_DIR, SCE_DATA_KEYS);
-      keysets_env = NULL;
-    } else {
-      sprintf(filename, "%s/%s", keysets_env, SCE_DATA_KEYS );
-      if (!exists(filename)) {
-	sprintf(filename, "%s/%s", SCE_DATA_DIR, SCE_DATA_KEYS);
-      }
-    }
-  } else {
-    sprintf(filename, "%s/%s", SCE_DATA_DIR, SCE_DATA_KEYS);
-  }
-  
+  get_data_filename(SCE_DATA_KEYS, filename);
   if (load_keysets(filename)) {
     if (verbose)
       printf("[*] Loaded keysets.\n");
@@ -326,16 +312,7 @@ int main(int argc, char **argv)
   }
 
   // loader curves
-  if (keysets_env) {
-    sprintf(filename, "%s/%s", keysets_env, SCE_DATA_LDR_CURVES);
-    if ( !exists(filename) ) {
-      sprintf(filename, "%s/%s", SCE_DATA_DIR, SCE_DATA_LDR_CURVES);
-    } else {
-      sprintf(filename, "%s/%s", keysets_env, SCE_DATA_LDR_CURVES);
-    }
-  } else {
-    sprintf(filename, "%s/%s", SCE_DATA_DIR, SCE_DATA_LDR_CURVES);
-  }
+  get_data_filename(SCE_DATA_LDR_CURVES, filename);
   if ( load_ldr_curves(filename) ) {
     if ( verbose )
       printf("[*] Loaded loader curves.\n");
@@ -344,16 +321,7 @@ int main(int argc, char **argv)
   }
 
   // vsh curves
-  if (keysets_env) {
-    sprintf(filename, "%s/%s", keysets_env, SCE_DATA_VSH_CURVES);
-    if ( !exists(filename) ) {
-      sprintf(filename, "%s/%s", SCE_DATA_DIR, SCE_DATA_VSH_CURVES);
-    } else {
-      sprintf(filename, "%s/%s", keysets_env, SCE_DATA_VSH_CURVES);
-    }
-  } else {
-    sprintf(filename, "%s/%s", SCE_DATA_DIR, SCE_DATA_VSH_CURVES);
-  }
+  get_data_filename(SCE_DATA_VSH_CURVES, filename);
   if ( load_vsh_curves(filename) ) {
     if ( verbose )
       printf("[*] Loaded loader curves.\n");
@@ -368,16 +336,7 @@ int main(int argc, char **argv)
     }
     klicensee = x_to_u8_buffer(klicensee_value);
   } else {
-    if (keysets_env) {
-      sprintf(filename, "%s/%s", keysets_env, SCE_DATA_KLICS);
-      if ( !exists(filename) ) {
-        sprintf(filename, "%s/%s", SCE_DATA_DIR, SCE_DATA_KLICS);
-      } else {
-        sprintf(filename, "%s/%s", keysets_env, SCE_DATA_KLICS);
-      }
-    } else {
-      sprintf(filename, "%s/%s", SCE_DATA_DIR, SCE_DATA_KLICS);
-    }
+    get_data_filename(SCE_DATA_KLICS, filename);
     if ( load_klicensees(filename) ) {
       if ( verbose )
         printf("[*] Loaded klicensees.\n");

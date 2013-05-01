@@ -30,6 +30,7 @@ void memcpy_inv(uint8_t *dst, uint8_t *src, uint32_t len);
 char *read_line(char *s, int size, FILE *stream);
 int valid_hex_digit(char c);
 int valid_hex(const char *hexstr);
+char *get_data_filename(const char *datafile, char *filename);
 
 #ifdef __cplusplus
 }
