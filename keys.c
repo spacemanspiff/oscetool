@@ -203,7 +203,11 @@ int load_keysets(const char *filename) {
 	line[i] = 0;
 	current_keyset = (keyset_t *)malloc(sizeof(keyset_t));
 	memset(current_keyset, 0, sizeof(keyset_t));
-	current_keyset->name = strndup(&line[1], len);
+	current_keyset->name = malloc(len + 1);
+	if (!current_keyset->name)
+	  return 0;
+	strncpy(current_keyset->name, &line[1], len);
+	current_keyset->name[len] = 0;
       } else {
 	if (current_keyset) {
 	  int i = 0;
